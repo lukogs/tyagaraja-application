@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Generator - Tyagaraja Sangeetholsavam</title>
+    <style>
+        /* Screen UI Styling */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 15px; line-height: 1.5; }
+        .container { max-width: 700px; margin: auto; }
+        
+        /* Instruction Note */
+        .instruction-note { 
+            background-color: #e8f4fd; 
+            border-left: 5px solid #3498db; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 4px;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        /* Privacy Warning Alert (Bootstrap style) */
+        .alert-privacy {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        h2 { color: #2c3e50; text-align: center; margin-top: 0; border-bottom: 2px solid #27ae60; padding-bottom: 10px; font-size: 1.5rem; }
+        
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #34495e; font-size: 14px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 16px; /* 16px prevents iOS zoom on focus */ }
+        textarea { height: 80px; resize: vertical; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-print { flex: 2; padding: 14px; background-color: #27ae60; border: none; color: white; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        .btn-clear { flex: 1; padding: 14px; background-color: #e74c3c; border: none; color: white; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+        
+        .preview-title { font-weight: bold; color: #7f8c8d; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        .preview-area { font-family: "Times New Roman", Times, serif; border: 1px dashed #bdc3c7; padding: 20px; background-color: #fff; font-size: 15px; line-height: 1.6; color: #333; overflow-x: auto; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .btn-group { flex-direction: column; }
+            .btn-print, .btn-clear { width: 100%; }
+            body { padding: 10px; }
+            .card { padding: 15px; }
+            .preview-area { padding: 15px; font-size: 14px; }
+        }
+        
+        /* Print Layout Logic */
+        #printableLetter { display: none; }
+
+        @media print {
+            @page { size: A4; margin: 20mm; }
+            body { background: white; padding: 0; }
+            .container { display: none; } 
+            #printableLetter { display: block !important; font-family: "Times New Roman", Times, serif; line-height: 1.6; font-size: 12pt; color: black; }
+            .letter-header { margin-bottom: 20px; }
+            .letter-section-title { font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
+            .details-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; line-height: 1.2; }
+            .details-table td { padding: 2px 0; vertical-align: top; }
+            .label-col { width: 35%; font-weight: bold; }
+            .data-col { width: 65%; }
+            p { margin: 15px 0; text-align: justify; }
+            .footer-sign { margin-top: 50px; }
+            .hidden-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="instruction-note">
+        <strong>How to use:</strong><br>
+        1. <strong>Print (If you have access to printer):</strong> Fill out the form and click "Generate & Print" to create a ready-to-print A4 letter or use Save as PDF option to download and print later.<br>
+        2. <strong>Handwritten:</strong> If you don't have access to a printer, scroll down to the "Reference Format" to write the letter on an A4 paper.
+    </div>
+
+    <div class="alert-privacy">
+        <span>⚠️ <strong>Privacy Note:</strong> This application runs entirely in your browser. It does <u>not</u> store your data in a database or send your information to any server.</span>
+    </div>
+
+    <span class="preview-title">To print instantly</span>
+    <div class="card">
+        <h2>Application Generator</h2>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="formName" class="input-field" placeholder="Enter student name">
+        </div>
+        <div class="form-group">
+            <label>Full Address</label>
+            <textarea id="formAddress" class="input-field" placeholder="Enter postal address"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="formPhone" class="input-field" placeholder="Contact number">
+        </div>
+        <div class="form-group">
+            <label>Name of Guru/Teacher (Optional)</label>
+            <input type="text" id="formGuru" class="input-field" placeholder="Teacher's name">
+        </div>
+        <div class="form-group">
+            <label>Duration of Training (Optional)</label>
+            <input type="text" id="formDuration" class="input-field" placeholder="e.g. 3 Years">
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn-print" onclick="generateLetter()">Generate & Print</button>
+            <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+        </div>
+    </div>
+
+    <span class="preview-title">Reference Format (For Handwriting)</span>
+    <div class="card preview-area">
+        <strong>To,</strong><br>
+        K V Surendra Babu,<br>
+        “Viswas”, Thirumangalath,<br>
+        Pariyangadu, Cherukulathur PO,<br>
+        Kozhikode - 673008<br><br>
+        
+        <strong>Subject: Application for Participation in Tyagaraja Sangeetholsavam</strong><br><br>
+        
+        Respected Sir/Madam,<br>
+        I am writing to express my sincere interest in participating as a devotee in the upcoming Tyagaraja Sangeetholsavam to be held in Kozhikode. I wish to offer my humble rendition of Tyagaraja kritis as a mark of devotion to the great saint-composer.<br><br>
+        
+        <strong>PERSONAL DETAILS:</strong><br>
+        Name: [Your Name]<br>
+        Address: [Your Address]<br>
+        Phone Number: [Your Phone Number]<br><br>
+        
+        <strong>MUSICAL TRAINING:</strong><br>
+        Name of Guru/Teacher: [Guru Name]<br>
+        Duration of Training: [Years/Months]<br><br>
+        
+        I have been learning Carnatic music under the able guidance of my guru and would be honoured to participate in this sacred event. I assure you of my sincere dedication and commitment to upholding the devotional spirit of this program.<br><br>
+        
+        Thank you for considering my application. I look forward to your favourable response.<br><br>
+        
+        Yours sincerely,<br><br>
+        (Signature)<br>
+        [Your Full Name]
+    </div>
+</div>
+
+<div id="printableLetter">
+    <div class="letter-header">
+        <strong>To,</strong><br>
+        K V Surendra Babu,<br>
+        “Viswas”, Thirumangalath,<br>
+        Pariyangadu, Cherukulathur PO,<br>
+        Kozhikode - 673008
+    </div>
+    <div><strong>Date:</strong> <span id="printDate"></span></div>
+    <div style="margin-top: 20px;"><strong>Subject: Application for Participation in Tyagaraja Sangeetholsavam</strong></div>
+    <p>Respected Sir/Madam,</p>
+    <p>I am writing to express my sincere interest in participating as a devotee in the upcoming Tyagaraja Sangeetholsavam to be held in Kozhikode. I wish to offer my humble rendition of Tyagaraja kritis as a mark of devotion to the great saint-composer.</p>
+    <div class="letter-section-title">PERSONAL DETAILS:</div>
+    <table class="details-table">
+        <tr><td class="label-col">Name:</td><td class="data-col" id="printName"></td></tr>
+        <tr><td class="label-col">Address:</td><td class="data-col" id="printAddress" style="white-space: pre-wrap;"></td></tr>
+        <tr><td class="label-col">Phone Number:</td><td class="data-col" id="printPhone"></td></tr>
+    </table>
+    <div id="trainingSection">
+        <div class="letter-section-title">MUSICAL TRAINING:</div>
+        <table class="details-table">
+            <tr id="rowGuru"><td class="label-col">Name of Guru/Teacher:</td><td class="data-col" id="printGuru"></td></tr>
+            <tr id="rowDuration"><td class="label-col">Duration of Training:</td><td class="data-col" id="printDuration"></td></tr>
+        </table>
+    </div>
+    <p id="guruSentence">I have been learning Carnatic music under the able guidance of my guru and would be honoured to participate in this sacred event. I assure you of my sincere dedication and commitment to upholding the devotional spirit of this program.</p>
+    <p>Thank you for considering my application. I look forward to your favourable response.</p>
+    <div class="footer-sign">Yours sincerely,<br><br><br>(<span id="printNameFooter"></span>)</div>
+</div>
+
+<script>
+    function generateLetter() {
+        const fields = ['Name', 'Address', 'Phone', 'Guru', 'Duration'];
+        const data = {};
+        fields.forEach(f => data[f.toLowerCase()] = document.getElementById('form'+f).value.trim());
+
+        document.getElementById('printName').innerText = data.name || "________________";
+        document.getElementById('printNameFooter').innerText = data.name || "________________";
+        document.getElementById('printAddress').innerText = data.address || "________________";
+        document.getElementById('printPhone').innerText = data.phone || "________________";
+        
+        const trainingDiv = document.getElementById('trainingSection');
+        const guruSentence = document.getElementById('guruSentence');
+
+        if (!data.guru && !data.duration) {
+            trainingDiv.classList.add('hidden-print');
+            guruSentence.innerText = "I would be honoured to participate in this sacred event. I assure you of my sincere dedication and commitment to upholding the devotional spirit of this program.";
+        } else {
+            trainingDiv.classList.remove('hidden-print');
+            document.getElementById('printGuru').innerText = data.guru || "N/A";
+            document.getElementById('printDuration').innerText = data.duration || "N/A";
+            guruSentence.innerText = "I have been learning Carnatic music under the able guidance of my guru and would be honoured to participate in this sacred event. I assure you of my sincere dedication and commitment to upholding the devotional spirit of this program.";
+            document.getElementById('rowGuru').style.display = data.guru ? "table-row" : "none";
+            document.getElementById('rowDuration').style.display = data.duration ? "table-row" : "none";
+        }
+
+        const today = new Date();
+        document.getElementById('printDate').innerText = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        window.print();
+    }
+
+    function clearForm() {
+        if(confirm("Are you sure you want to clear the form?")) {
+            const inputs = document.querySelectorAll('.input-field');
+            inputs.forEach(input => input.value = '');
+        }
+    }
+</script>
+
+</body>
+</html>
